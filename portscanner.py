@@ -1,10 +1,8 @@
 from socket import socket
-
 import ipaddress
 import psutil
 
-
-class PortScanner():
+class PortScanner:
 
     def __init__(self, port=161):
         self.port = port
@@ -46,7 +44,7 @@ class PortScanner():
 
         ip_range = list(net.hosts())
         for ip in ip_range:
-            if(self.ip_check(str(ip))):
+            if self.ip_check(str(ip)):
                 open_devices.append(ip)
             else:
                 pass
