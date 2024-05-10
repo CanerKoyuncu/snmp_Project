@@ -11,7 +11,6 @@ def write_to_txt(fileName, linesAsArray):
             else:
                 file.write(str(line)+'\n')
 
-
 def read_from_csv(fileName: str):
     reader = pd.read_csv(f"{fileName}")
     reader = reader.values.tolist()

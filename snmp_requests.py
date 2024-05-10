@@ -1,39 +1,6 @@
 import pysnmp.entity.engine
-from pysnmp.hlapi import CommunityData, UdpTransportTarget, getCmd, ContextData, nextCmd, bulkCmd
+from pysnmp.hlapi import CommunityData, UdpTransportTarget, getCmd, ContextData, nextCmd
 from pysnmp.smi.rfc1902 import ObjectType, ObjectIdentity
-
-import bulk_request
-import file_ops
-
-
-def snmp_scanner(ip_list):
-    oids = file_ops.read_from_csv("files/oid.csv")
-    for ip in ip_list:
-        snmp_data = get_snmp_table(ip, oids)
-        if snmp_data:
-            file_ops.write_to_txt(f"files/{ip}.txt", snmp_data)
-
-
-def get_snmp_table(ip, oids, com="public", port=161):
-
-    data = []
-    for oid in oids:
-        get_response = get_request(oid[0], ip, port, com)
-        if get_response != 0:
-            oid = get_response[0]
-            value = get_response[1]
-            data.append([oid.prettyPrint(), value.prettyPrint()])
-
-        get_next_response = get_next_request(oid, ip, port, "public")
-        if get_next_response != 0:
-            oid = get_next_response[0]
-            value = get_next_response[1]
-            data.append([oid.prettyPrint(), value.prettyPrint()])
-    unique_data=[]
-    for element in data:
-        if not element in unique_data:
-            unique_data.append(element)
-    return unique_data
 
 
 def get_request(oid, ip, port, com):
@@ -58,9 +25,10 @@ def get_request(oid, ip, port, com):
     elif err_stat:
         print(f"SNMP Hatası: {err_stat.prettyPrint()}")
         return None
-
+    if len(response) != 0:
+        return response[0]
     else:
-        return response
+        return 0
 
 
 def get_next_request(oid, ip, port, com):
@@ -77,7 +45,7 @@ def get_next_request(oid, ip, port, com):
     try:
         var_bind = ObjectType(ObjectIdentity(oid))
         err_ind, err_stat, err_ind, response = next(
-            nextCmd(engine, community, connection, ContextData(), var_bind, lexicographicMode=False))
+            nextCmd(engine, community, connection, ContextData(), var_bind,    lookupMib=True, lookupValues=True))
     except Exception as e:
         print(e)
 
@@ -87,5 +55,7 @@ def get_next_request(oid, ip, port, com):
     elif err_stat:
         print(f"SNMP Hatası: {err_stat.prettyPrint()}")
         return None
-    else:
+    if response is not None:
         return response
+    else:
+        return 0
