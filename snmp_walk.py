@@ -5,7 +5,7 @@ from snmp_requests import get_next_request
 
 def snmp_scanner(ip_list,file_name, port=161, com="public", oid="1.3.6.1.2.1.1.3.0", verbose= False):
     if oid == None:
-        oid = "1.3.6.1.2.1.1.2.0"
+        oid = "1.3.6.1.2.1.1.3.0"
     if port == None:
         port = 161
     if com == None:
